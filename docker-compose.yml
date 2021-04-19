@@ -1,0 +1,25 @@
+---
+version: "3"
+services:
+  chrome_1.pickles:
+    image: selenium/node-chrome:4.0.0-beta-3-prerelease-20210402
+    volumes:
+      - /dev/shm:/dev/shm
+    depends_on:
+      - selenium-hub.pickles
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub.pickles
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - TZ="Pacific/Auckland"
+    ports:
+      - "6901:5900"
+  selenium-hub.pickles:
+    image: selenium/hub:4.0.0-beta-3-prerelease-20210402
+    container_name: selenium-hub.pickles
+    environment:
+      - TZ="Pacific/Auckland"
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "7777:4444"

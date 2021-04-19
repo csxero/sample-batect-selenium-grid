@@ -1,0 +1,38 @@
+---
+project_name: sample_selenium_grid
+containers:
+  automation-setup:
+    image: mcr.microsoft.com/playwright:v1.10.0-bionic
+    working_directory: /code
+    enable_init_process: true
+  chrome_1.pickles:
+    image: selenium/node-chrome:4.0.0-beta-3-prerelease-20210402
+    volumes:
+      - /dev/shm:/dev/shm
+    dependencies:
+      - selenium-hub.pickles
+    environment:
+      SE_EVENT_BUS_HOST: selenium-hub.pickles
+      SE_EVENT_BUS_PUBLISH_PORT: "4442"
+      SE_EVENT_BUS_SUBSCRIBE_PORT: "4443"
+    ports:
+      - "6901:5900"
+  selenium-hub.pickles:
+    image: selenium/hub:4.0.0-beta-3-prerelease-20210402
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "7777:4444"
+    health_check:
+      command: curl -fsS selenium-hub.pickles:4444/wd/hub/status
+      interval: 5s
+      retries: 20
+tasks:
+  test-grid:
+    description: Run tests over grid
+    dependencies:
+      - chrome_1.pickles
+      - selenium-hub.pickles
+    run:
+      container: automation-setup
+      command: sleep 5m
